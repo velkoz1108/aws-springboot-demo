@@ -1,8 +1,10 @@
 package com.twang.awsspringbootdemo;
 
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -29,11 +31,12 @@ public class S3Controller {
     }
 
     @GetMapping("/list/{bucketName}/{filePath}")
-    public String getFileList(@PathVariable String bucketName, @PathVariable String filePath) {
+    public String getFileList(@PathVariable String bucketName, @PathVariable String filePath,
+                              @RequestParam(required = false) String region) {
         System.out.println("filePath = " + filePath);
 
         S3Client s3Client = S3Client.builder()
-                .region(Region.US_WEST_1)
+                .region(StringUtils.hasText(region) ? Region.of(region) : Region.US_WEST_2)
                 .build();
 
         ListObjectsV2Request request = ListObjectsV2Request.builder()
