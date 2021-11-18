@@ -10,6 +10,8 @@ import software.amazon.awssdk.services.cloudfront.CloudFrontClient;
 import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationRequest;
 import software.amazon.awssdk.services.cloudfront.model.CreateInvalidationResponse;
 import software.amazon.awssdk.services.cloudfront.model.InvalidationBatch;
+import software.amazon.awssdk.services.cloudfront.model.ListInvalidationsRequest;
+import software.amazon.awssdk.services.cloudfront.model.ListInvalidationsResponse;
 import software.amazon.awssdk.services.cloudfront.model.Paths;
 
 import java.util.Arrays;
@@ -19,7 +21,7 @@ import java.util.List;
 @RequestMapping("/cdn")
 public class CloudFrontController {
 
-    @GetMapping(value = "/invalidation/{distributionId}")
+    @GetMapping(value = "/create/invalidation/{distributionId}")
     public String createInvalidation(@PathVariable String distributionId,
                                      @RequestParam String path) {
         String[] pathArray = path.split(",");
@@ -40,5 +42,18 @@ public class CloudFrontController {
         System.out.println("response callerReference = " + response.invalidation().invalidationBatch().callerReference());
         System.out.println("response paths = " + response.invalidation().invalidationBatch().paths().toString());
         return response.invalidation().status();
+    }
+
+    @GetMapping("/list/invalidation/{distributionId}")
+    public String listInvalidations(@PathVariable String distributionId) {
+        CloudFrontClient client = CloudFrontClient.builder()
+                .region(Region.AWS_GLOBAL)
+                .build();
+
+        ListInvalidationsRequest request = ListInvalidationsRequest.builder()
+                .distributionId(distributionId).build();
+        ListInvalidationsResponse response = client.listInvalidations(request);
+        System.out.println("response = " + response);
+        return response.toString();
     }
 }
